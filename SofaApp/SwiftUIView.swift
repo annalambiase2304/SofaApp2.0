@@ -18,7 +18,7 @@ struct SwiftUIView: View {
                 Rectangle()
                     .frame(width: 60, height: 40)
 //                    .foregroundColor((colorScheme == .dark) ? Color.darkButton : Color.lightButton)
-                    .foregroundStyle(.red).opacity(0.9)
+                    .foregroundStyle(.purple).opacity(0.9)
                 
             }
         }
