@@ -10,7 +10,7 @@ import SwiftUI
 
 // 1. Vista Personalizzata per la Riga del Menu
 struct MenuItemRow: View {
-    let item: MenuItem
+    let item: AppList
 
     var body: some View {
         HStack {
@@ -23,7 +23,7 @@ struct MenuItemRow: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 25, height: 25)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.blue)
             }
             .padding(.trailing, 10)
 
@@ -34,26 +34,40 @@ struct MenuItemRow: View {
             Spacer()
         }
         .padding()
-        .background(Color.white)
+        .background(Color(.secondarySystemBackground))
         .cornerRadius(15)
         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 5)
     }
 }
 
-// 2. Vista di Dettaglio (la destinazione dopo il click)
 struct DetailView: View {
-    let menuItem: MenuItem
+    // Riceve ancora il binding, che è utile se vogliamo
+    // aggiungere/eliminare items in futuro.
+    @Binding var list: AppList
+    let mainColor = Color.blue
 
     var body: some View {
-        VStack {
-            Text("Lista per: \(menuItem.name)")
-                .font(.title)
-                .padding()
-            Image(systemName: "list.bullet")
-                .font(.largeTitle)
-            Spacer()
+        List {
+            // 👈 MODIFICA: Iteriamo sugli items statici (non più $list.items)
+            ForEach(list.items) { item in
+                
+                // 👈 SOSTITUITO: Rimosso il Toggle, usato un HStack
+                HStack(spacing: 12) {
+                    // Usiamo l'icona della lista genitore
+                    Image(systemName: list.iconName)
+                        .font(.callout) // Una dimensione media per l'icona
+                        .foregroundColor(mainColor) // Colore blu
+                        .frame(width: 20, alignment: .center) // Per allineare
+                    
+                    Text(item.name)
+                }
+            }
         }
-        .navigationTitle(menuItem.name)
+        .navigationTitle(list.name)
+        .toolbar {
+            // (In futuro, potremmo aggiungere un pulsante "+" qui
+            // per aggiungere nuovi items a QUESTA lista)
+        }
     }
 }
 
@@ -75,5 +89,5 @@ struct PlaceholderView: View {
 
 // Anteprima per il debugging (opzionale)
 #Preview {
-    MenuItemRow(item: mainMenuItems.first!)
+    MenuItemRow(item: AppData().lists.first!)
 }

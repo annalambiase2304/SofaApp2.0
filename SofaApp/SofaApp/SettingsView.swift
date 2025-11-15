@@ -14,44 +14,46 @@ struct SettingsView: View {
     let legalItems = ["Privacy Policy", "Terms of Use"]
     
     var body: some View {
-        List {
-            // Sezione 1: Informazioni e Contatti
-            Section(header: Text("About")) {
-                ForEach(aboutItems, id: \.self) { item in
-                    NavigationLink(destination: PlaceholderView(title: item, icon: "info.circle")) {
-                        HStack {
-                            Text(item)
-                            Spacer()
-                            // Icone decorative
-                            if item == "Contact Us" {
-                                Image(systemName: "envelope")
-                                    .foregroundColor(.secondary)
+        // 👈 1. AGGIUNGI QUESTO
+        NavigationStack {
+            List {
+                // Sezione 1: Informazioni e Contatti
+                Section(header: Text("About")) {
+                    ForEach(aboutItems, id: \.self) { item in
+                        NavigationLink(destination: PlaceholderView(title: item, icon: "info.circle")) {
+                            HStack {
+                                Text(item)
+                                Spacer()
+                                // Icone decorative
+                                if item == "Contact Us" {
+                                    Image(systemName: "envelope")
+                                        .foregroundColor(.secondary)
+                                }
                             }
                         }
                     }
                 }
-            }
-            
-            // Sezione 2: Legale
-            Section(header: Text("Legal")) {
-                ForEach(legalItems, id: \.self) { item in
-                    NavigationLink(destination: PlaceholderView(title: item, icon: "doc.text")) {
-                        Text(item)
+                
+                Section(header: Text("Legal")) {
+                    ForEach(legalItems, id: \.self) { item in
+                        NavigationLink(destination: PlaceholderView(title: item, icon: "doc.text")) {
+                            Text(item)
+                        }
+                    }
+                }
+                
+                Section {
+                    HStack {
+                        Text("Version")
+                        Spacer()
+                        Text("1.0 (1)")
+                            .foregroundColor(.secondary)
                     }
                 }
             }
+            .navigationTitle("Settings")
             
-            // Sezione 3: Altro (es. Version)
-            Section {
-                HStack {
-                    Text("Version")
-                    Spacer()
-                    Text("1.0 (1)")
-                        .foregroundColor(.secondary)
-                }
-            }
         }
-        .navigationTitle("Settings")
     }
 }
 #Preview {

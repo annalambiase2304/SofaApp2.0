@@ -8,37 +8,52 @@
 import SwiftUI
 
 struct LogbookView: View {
-    let mainColor = Color(red: 0.2, green: 0.6, blue: 0.5)
+    @EnvironmentObject var data: AppData
+    let mainColor = Color.blue
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            // Intestazione
-            Group {
-                Text("Logbook")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(mainColor)
-                Text("A log of how you’ve spent your downtime.")
-                    .font(.title3)
-                    .padding(.bottom, 20)
-            }
-            .padding(.horizontal)
-            ScrollView {
-                VStack(spacing: 15) {
-                    ForEach(mainMenuItems) { item in
-                        NavigationLink(destination: DetailView(menuItem: item)) {
-                            MenuItemRow(item: item)
+        // Rimuovi il VStack esterno. La List è ora la vista principale.
+        List {
+            ForEach(data.lists.indices, id: \.self) { listIndex in
+                let list = data.lists[listIndex]
+                
+                if !list.items.isEmpty {
+                    Section(header: Text(list.name)) {
+                        
+                        ForEach(list.items.indices, id: \.self) { itemIndex in
+                            
+                            let isCheckedBinding = $data.lists[listIndex].items[itemIndex].isChecked
+                            let itemName = data.lists[listIndex].items[itemIndex].name
+                            
+                            // Checkbox personalizzata
+                            Button(action: {
+                                isCheckedBinding.wrappedValue.toggle()
+                            }) {
+                                HStack(spacing: 10) {
+                                    Image(systemName: isCheckedBinding.wrappedValue ? "checkmark.square.fill" : "square")
+                                        .font(.title3)
+                                        .foregroundColor(mainColor)
+                                    
+                                    Text(itemName)
+                                        .foregroundColor(.primary)
+                                    
+                                    Spacer()
+                                }
+                            }
+                            .buttonStyle(PlainButtonStyle())
                         }
-                        .buttonStyle(PlainButtonStyle())
                     }
                 }
-                .padding(.horizontal)
             }
-           
         }
-        Spacer()
+        .listStyle(InsetGroupedListStyle())
+        .navigationTitle("Logbook")
     }
 }
+
 #Preview {
-    LogbookView()
+    NavigationStack {
+        LogbookView()
+    }
+    .environmentObject(AppData())
 }

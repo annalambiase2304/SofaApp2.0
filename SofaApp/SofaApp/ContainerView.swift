@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContainerView: View {
-    @State private var appData = AppData()
+    @StateObject private var appData = AppData()
     
     @State var selectedTab: Tabs = .main
     @State var searchString = ""
@@ -24,15 +24,12 @@ struct ContainerView: View {
             
             Tab ("Logbook", systemImage: "note.text", value: .logbook) {
                 NavigationStack {
-                    // Assicurati che LogbookView sia definita
-                    // LogbookView()
-                    Text("Logbook") // Placeholder
+                    LogbookView()
+                   
                 }
             }
             Tab ("Settings", systemImage: "gear", value: .settings){
-                // Assicurati che SettingsView sia definita
-                // SettingsView()
-                Text("Settings") // Placeholder
+                SettingsView()
             }
             Tab (value: .search, role: .search) {
                 NavigationStack {
@@ -46,12 +43,12 @@ struct ContainerView: View {
         }
         .tint(.blue)
         // 👈 2. INIETTA L'UNICA FONTE DI VERITÀ
-        .environment(appData)
+        .environmentObject(appData)
     }
 }
 
  
 #Preview {
     ContainerView()
-        .environment(AppData()) // La preview ha bisogno della sua copia
+        .environmentObject(AppData()) // La preview ha bisogno della sua copia
 }

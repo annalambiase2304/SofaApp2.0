@@ -5,32 +5,15 @@
 //  Created by Anna Lambiase on 11/11/25.
 //
 
-
+import Combine
 import SwiftUI
 
-// 1. Dati per le righe scorrevoli
-struct MenuItem: Identifiable {
-    let id = UUID()
-    let name: String
-    let iconName: String
-    let color: Color
+// 1. Enum per la selezione delle Tab (barra inferiore)
+enum Tabs {
+    case main, logbook, settings, search
 }
 
-let mainMenuItems = [
-    MenuItem(name: "Apps to Check Out", iconName: "lightbulb", color: Color(red: 0.95, green: 0.9, blue: 0.8)),
-    MenuItem(name: "Books to read", iconName: "book", color: Color(red: 0.95, green: 0.9, blue: 0.8)),
-    MenuItem(name: "Games to play", iconName: "gamecontroller", color: Color(red: 0.95, green: 0.9, blue: 0.8)),
-    MenuItem(name: "Movies to watch", iconName: "popcorn", color: Color(red: 0.95, green: 0.9, blue: 0.8)),
-    MenuItem(name: "TV series to bingewatch", iconName: "popcorn", color: Color(red: 0.95, green: 0.9, blue: 0.8)),
-    MenuItem(name: "Boardgames to try", iconName: "popcorn", color: Color(red: 0.95, green: 0.9, blue: 0.8))
-]
-
-// 2. Enum per la selezione delle Tab (barra inferiore)
-enum Tabs { 
-    case main, logbook, settings, search 
-}
-
-// 3. Enum per le opzioni di creazione del bottone "+"
+// 2. Enum per le opzioni di creazione del bottone "+"
 enum CreationOption: String, Identifiable {
     case items, newList, newGroup
     
@@ -45,9 +28,7 @@ enum CreationOption: String, Identifiable {
     }
 }
 
-// All'interno di DataModels.swift
-
-// Struttura per un Gruppo
+// 3. Struttura per un Gruppo
 struct ListGroup: Identifiable, Hashable {
     let id = UUID()
     var name: String
@@ -60,37 +41,55 @@ let mockGroups: [ListGroup] = [
     ListGroup(name: "Personal")
 ]
 
+// 4. Struttura per un SINGOLO ELEMENTO (Es. "1984")
+// 👈 QUESTO È IL NUOVO ELEMENTO FONDAMENTALE
+struct ListItem: Identifiable, Hashable {
+    let id = UUID()
+    var name: String
+    var isChecked: Bool = false // Per la checklist
+}
+
+// 5. Struttura per una Lista (Ora contiene un array di ListItem)
 struct AppList: Identifiable, Hashable {
     let id = UUID()
     var name: String
     let iconName: String
     let color: Color
-    var group: ListGroup? // Gruppo a cui appartiene (opzionale)
+    var group: ListGroup?
+    var items: [ListItem] = [] // 👈 MODIFICA: La lista ora ha elementi
 }
 
-@Observable
-class AppData {
-    // Le liste iniziali che vengono dalla tua "mainMenuItems"
-    var lists: [AppList] = [
-        AppList(name: "Apps to Check Out", iconName: "lightbulb", color: Color(red: 0.95, green: 0.9, blue: 0.8), group: mockGroups.first!),
-        AppList(name: "Books to read", iconName: "book", color: Color(red: 0.95, green: 0.9, blue: 0.8), group: mockGroups.first!),
-        AppList(name: "Games to play", iconName: "gamecontroller", color: Color(red: 0.95, green: 0.9, blue: 0.8), group: mockGroups.first!),
-        AppList(name: "Movies to watch", iconName: "popcorn", color: Color(red: 0.95, green: 0.9, blue: 0.8), group: mockGroups.first!),
-        AppList(name: "TV series to bingewatch", iconName: "popcorn", color: Color(red: 0.95, green: 0.9, blue: 0.8), group: mockGroups.first!),
-        AppList(name: "Boardgames to try", iconName: "popcorn", color: Color(red: 0.95, green: 0.9, blue: 0.8), group: mockGroups.first!)
+// 6. Classe Dati Osservabile
+
+class AppData: ObservableObject {
+    @Published var lists:[ AppList] = [
+        AppList(name: "Apps to Check Out", iconName: "lightbulb", color: .blue.opacity(0.2), group: mockGroups.first!,
+                items: [ListItem(name: "Sofa App (Questa!)"), ListItem(name: "Widget App Esempio")]),
+        
+        AppList(name: "Books to read", iconName: "book", color: .blue.opacity(0.2), group: mockGroups.first!,
+                items: [ListItem(name: "Dune"), ListItem(name: "1984")]),
+        
+        AppList(name: "Games to play", iconName: "gamecontroller", color: .blue.opacity(0.2), group: mockGroups.first!,
+                items: [ListItem(name: "Elden Ring")]),
+        
+        AppList(name: "Movies to watch", iconName: "popcorn", color: .blue.opacity(0.2), group: mockGroups.first!),
+        
+        AppList(name: "TV series to bingewatch", iconName: "popcorn", color: .blue.opacity(0.2), group: mockGroups.first!),
+        
+        AppList(name: "Boardgames to try", iconName: "popcorn", color: .blue.opacity(0.2), group: mockGroups.first!)
     ]
 
-    var groups: [ListGroup] = mockGroups
+    @Published var groups: [ListGroup] = mockGroups
 
-    // Metodo per aggiungere una nuova lista
+    // Metodo per aggiungere una nuova lista (ora crea una lista VUOTA di items)
     func addNewList(title: String, group: ListGroup) {
         let newList = AppList(
             name: title,
             iconName: "list.bullet.rectangle.fill",
-            color: Color(red: 0.95, green: 0.9, blue: 0.8),
-            group: group.name == "No Group" ? nil : group // Seleziona nil se è "No Group"
+            color: .blue.opacity(0.2),
+            group: group.name == "No Group" ? nil : group,
+            items: [] // Inizia con un array di elementi vuoto
         )
         lists.append(newList)
     }
 }
-

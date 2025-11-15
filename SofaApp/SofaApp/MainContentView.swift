@@ -9,10 +9,10 @@
 import SwiftUI
 
 struct MainContentView: View {
-   
+    @EnvironmentObject var data: AppData
     // Stato per gestire il modale
     @State private var selectedCreationOption: CreationOption? = nil
-    let mainColor = Color(red: 0.2, green: 0.6, blue: 0.5)
+    let mainColor = Color.blue
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -27,36 +27,36 @@ struct MainContentView: View {
                     .padding(.bottom, 20)
             }
             .padding(.horizontal)
-
+            
             // Contenuto scorrevole con le righe del menu
             ScrollView {
                 VStack(spacing: 15) {
-                    ForEach(mainMenuItems) { item in
-                        NavigationLink(destination: DetailView(menuItem: item)) {
-                            MenuItemRow(item: item)
+                    ForEach(data.lists.indices, id: \.self) { index in
+                        // Passiamo il binding $data.lists[index]
+                        NavigationLink(destination: DetailView(list: $data.lists[index])) {
+                            // Passiamo l'item normale data.lists[index]
+                            MenuItemRow(item: data.lists[index])
                         }
                         .buttonStyle(PlainButtonStyle())
                     }
                 }
                 .padding(.horizontal)
             }
-            
-            Spacer()
         }
-        .navigationTitle("")
+        
         .toolbar {
-            // Pulsante "+" per aprire il menu di creazione
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
-                    selectedCreationOption = .items // Trigger per aprire OptionsMenuView
+                    selectedCreationOption = .items
                 } label: {
                     Image(systemName: "plus")
-                        .font(.headline)
-                        .foregroundColor(mainColor)
-                        .clipShape(Circle())
+                    .font(.system(size: 30))
+                    .foregroundColor(.blue)
                 }
+                .buttonStyle(PlainButtonStyle())
             }
         }
+    
         // Il foglio modale che presenta il menu di creazione
         .sheet(item: $selectedCreationOption) { option in
             OptionsMenuView(selectedOption: option)
@@ -72,3 +72,4 @@ struct MainContentView: View {
 #Preview {
     ContainerView()    
 }
+ 

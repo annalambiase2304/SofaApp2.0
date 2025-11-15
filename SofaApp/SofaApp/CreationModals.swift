@@ -1,13 +1,9 @@
 import SwiftUI
 
-
 // 1. MenuView: Il primo modale che appare con i 3 pulsanti
 struct OptionsMenuView: View {
-    // Questa è l'azione di chiusura per il modale radice (OptionsMenuView)
     @Environment(\.dismiss) var dismiss
-    
     @State private var secondaryOption: CreationOption? = nil
-    
     let selectedOption: CreationOption
     let mainColor = Color.blue
 
@@ -20,14 +16,10 @@ struct OptionsMenuView: View {
                     OptionButton(option: .newGroup, mainColor: mainColor, action: { secondaryOption = .newGroup })
                 }
                 .padding(.top, 10)
-                
                 Spacer()
             }
             .padding()
-            // Presenta la schermata secondaria (che si espande)
             .sheet(item: $secondaryOption) { option in
-                // Passiamo 'dismiss' (che è l'azione di chiusura di questo modale)
-                // ai figli, che lo useranno come 'dismissParent'.
                 switch option {
                 case .items:
                     ItemsView (dismissParent: dismiss)
@@ -36,8 +28,8 @@ struct OptionsMenuView: View {
                 case .newGroup:
                     NewGroupView(dismissParent: dismiss)
                 }
+                // NOTA: Il modale eredita automaticamente l'environmentObject dal genitore
             }
-            // Inietta l'ambiente AppData anche ai modali secondari
         }
     }
 }
@@ -52,13 +44,12 @@ struct OptionButton: View {
         Button(action: action) {
             VStack {
                 Circle()
-                    .fill(Color(red: 0.9, green: 0.9, blue: 0.9))
+                    .fill(Color(.systemGray6)) // Corretto
                     .frame(width: 70, height: 70)
                     .overlay {
                         Image(systemName: iconFor(option))
                             .foregroundColor(mainColor)
                     }
-                
                 Text(option.title)
                     .font(.subheadline)
                     .foregroundColor(.primary)
@@ -77,29 +68,22 @@ struct OptionButton: View {
 
 // 2. NewListView (Crea Nuova Lista)
 struct NewListView: View {
-    // Dati centralizzati per l'aggiunta e la selezione del gruppo
-    @Environment(AppData.self) var data
+    // 👈 1. MODIFICA: Usa @EnvironmentObject
+    @EnvironmentObject var data: AppData
     
-    // Azione per chiudere l'intero flusso modale (passata da OptionsMenuView)
     let dismissParent: DismissAction
-    
     @State private var title: String = ""
-    @State private var selectedGroup: ListGroup = mockGroups.first! // Inizializzazione
+    @State private var selectedGroup: ListGroup = mockGroups.first!
 
     var body: some View {
-        // 👈 CORREZIONE: Aggiunto NavigationStack
         NavigationStack {
             VStack {
                 Form {
-                    // Sezione Titolo
                     Section {
                         TextField("Title", text: $title)
                             .autocorrectionDisabled(true)
                     }
-                    
-                    // Sezione Gruppo (Utilizza Picker per la tendina)
                     Section(header: Text("Group")) {
-                        // Carica i gruppi da AppData per vedere quelli nuovi
                         Picker("Select Group", selection: $selectedGroup) {
                             ForEach(data.groups) { group in
                                 Text(group.name).tag(group)
@@ -114,105 +98,138 @@ struct NewListView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    // ANNULLA: Chiude l'intero stack modale
                     Button("Cancel") { dismissParent() }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Create") {
-                        // 1. Azione: Salva i dati
                         data.addNewList(title: title, group: selectedGroup)
-                        
-                        // 2. Azione: Chiudi l'intero stack
                         dismissParent()
                     }
                     .disabled(title.isEmpty)
                 }
             }
-        } // 👈 Fine del NavigationStack
+        }
     }
 }
 
-
 // 3. NewGroupView (Crea Nuovo Gruppo)
 struct NewGroupView: View {
-    // Dati centralizzati per l'aggiunta del gruppo
-    @Environment(AppData.self) var data
+    // 👈 2. MODIFICA: Usa @EnvironmentObject
+    @EnvironmentObject var data: AppData
     
-    // Azione per chiudere l'intero flusso modale
     let dismissParent: DismissAction
-    
     @State private var groupName: String = ""
-    @Environment(\.dismiss) var dismiss // Non usato per azioni definitive
+    @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        // 👈 CORREZIONE: Aggiunto NavigationStack
         NavigationStack {
             VStack {
                 Text("What would you like to call this new group?")
                     .font(.headline)
                     .multilineTextAlignment(.center)
                     .padding(.top, 20)
-                
                 Form {
                     Section {
                         TextField("Group Name", text: $groupName)
                             .autocorrectionDisabled(true)
                     }
                 }
-                
                 Spacer()
             }
             .navigationTitle("New Group")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    // ANNULLA: Chiude l'intero stack modale
                     Button("Cancel") { dismissParent() }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Create") {
-                        // 1. Azione: Salva i dati
                         let newGroup = ListGroup(name: groupName)
                         data.groups.append(newGroup)
-                        
-                        // 2. Azione: Chiudi l'intero stack
                         dismissParent()
                     }
                     .disabled(groupName.isEmpty)
                 }
             }
-        } // 👈 Fine del NavigationStack
+        }
     }
 }
 
 // 4. ItemsView (Aggiungi Elementi)
 struct ItemsView: View {
-    // Azione per chiudere l'intero flusso modale
-    let dismissParent: DismissAction
+    // 1. Riceve i dati centralizzati
+    @EnvironmentObject var data: AppData
     
-    let itemOptions = ["Apps", "Books", "Movies & Shows", "Music Albums", "Custom"]
+    // Azione per chiudere l'intero flusso modale (pulsante "Cancel")
+    let dismissParent: DismissAction
 
     var body: some View {
-        // Questa vista aveva GIA' il NavigationStack, per questo funzionava
         NavigationStack {
             List {
-                ForEach(itemOptions, id: \.self) { item in
-                    HStack {
-                        Circle()
-                            .fill(Color(.systemGray6))
-                            .frame(width: 30, height: 30)
-                        
-                        Text(item)
+                // 2. Itera sulle TUE liste
+                // Usiamo gli indici per ottenere il binding ($)
+                ForEach(data.lists.indices, id: \.self) { index in
+                    
+                    // 3. NavigationLink passa il binding ($data.lists[index])
+                    //    alla nuova AddItemView
+                    NavigationLink(destination: AddItemView(list: $data.lists[index])) {
+                        // Mostra l'icona e il nome della lista
+                        HStack(spacing: 12) {
+                            Image(systemName: data.lists[index].iconName)
+                                .foregroundColor(.blue)
+                                .frame(width: 20)
+                            Text(data.lists[index].name)
+                        }
                     }
                 }
             }
-            .navigationTitle("Items")
+            .navigationTitle("Add Item to List")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    // ANNULLA: Chiude l'intero stack modale
+                    // Il pulsante "Cancel" ora chiude l'intero modale
                     Button("Cancel") { dismissParent() }
                 }
+            }
+        }
+    }
+}
+
+struct AddItemView: View {
+    // Binding ($) alla lista che stiamo modificando (es. "Apps to Check Out")
+    @Binding var list: AppList
+    
+    // Stato per il nome del nuovo item
+    @State private var newItemName: String = ""
+    
+    // Per chiudere questa vista (e tornare a ItemsView)
+    @Environment(\.dismiss) var dismiss
+    let mainColor = Color.blue
+
+    var body: some View {
+        // Usiamo un Form per l'input
+        Form {
+            Section(header: Text("New Item Name")) {
+                TextField("Es. 'Nuova App Fantastica'", text: $newItemName)
+                    .autocorrectionDisabled(true)
+            }
+        }
+        .navigationTitle("Add to \(list.name)")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel") { dismiss() } // Chiude solo questa vista
+            }
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Add") {
+                    // 1. Crea il nuovo item
+                    let newItem = ListItem(name: newItemName)
+                    // 2. Aggiungilo all'array della lista (grazie al @Binding)
+                    list.items.append(newItem)
+                    // 3. Chiudi questa vista
+                    dismiss()
+                }
+                .disabled(newItemName.isEmpty) // Disabilita se il testo è vuoto
             }
         }
     }
@@ -228,10 +245,10 @@ struct OptionsMenu_Preview: View {
         }
         .sheet(isPresented: $showingModal) {
             OptionsMenuView(selectedOption: .items)
-                .presentationDetents([.fraction(0.30)]) // Simula il modale a metà schermo
+                .presentationDetents([.fraction(0.30)])
         }
-        // Fornisce i dati necessari per l'anteprima (es. per il Picker)
-        .environment(AppData())
+        // 👈 3. MODIFICA: Usa .environmentObject (risolve l'errore della riga 232)
+        .environmentObject(AppData())
     }
 }
 
