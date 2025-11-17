@@ -14,7 +14,6 @@ struct SettingsView: View {
     let legalItems = ["Privacy Policy", "Terms of Use"]
     
     var body: some View {
-        // 👈 1. AGGIUNGI QUESTO
         NavigationStack {
             List {
                 // Sezione 1: Informazioni e Contatti

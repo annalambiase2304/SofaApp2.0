@@ -12,7 +12,6 @@ struct LogbookView: View {
     let mainColor = Color.blue
 
     var body: some View {
-        // Rimuovi il VStack esterno. La List è ora la vista principale.
         List {
             ForEach(data.lists.indices, id: \.self) { listIndex in
                 let list = data.lists[listIndex]

@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-// 1. Vista Personalizzata per la Riga del Menu
+//Vista Personalizzata per la Riga del Menu
 struct MenuItemRow: View {
     let item: AppList
 
@@ -41,23 +41,19 @@ struct MenuItemRow: View {
 }
 
 struct DetailView: View {
-    // Riceve ancora il binding, che è utile se vogliamo
     // aggiungere/eliminare items in futuro.
     @Binding var list: AppList
     let mainColor = Color.blue
 
     var body: some View {
         List {
-            // 👈 MODIFICA: Iteriamo sugli items statici (non più $list.items)
             ForEach(list.items) { item in
                 
-                // 👈 SOSTITUITO: Rimosso il Toggle, usato un HStack
                 HStack(spacing: 12) {
-                    // Usiamo l'icona della lista genitore
                     Image(systemName: list.iconName)
-                        .font(.callout) // Una dimensione media per l'icona
-                        .foregroundColor(mainColor) // Colore blu
-                        .frame(width: 20, alignment: .center) // Per allineare
+                        .font(.callout)
+                        .foregroundColor(mainColor)
+                        .frame(width: 20, alignment: .center) 
                     
                     Text(item.name)
                 }
@@ -71,7 +67,7 @@ struct DetailView: View {
     }
 }
 
-// 3. Viste vuote per Logbook e Settings
+// Viste vuote per Logbook e Settings
 struct PlaceholderView: View {
     let title: String
     let icon: String
@@ -87,7 +83,6 @@ struct PlaceholderView: View {
     }
 }
 
-// Anteprima per il debugging (opzionale)
 #Preview {
     MenuItemRow(item: AppData().lists.first!)
 }

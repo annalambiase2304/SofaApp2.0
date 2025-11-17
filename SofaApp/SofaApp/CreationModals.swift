@@ -1,6 +1,6 @@
 import SwiftUI
 
-// 1. MenuView: Il primo modale che appare con i 3 pulsanti
+// Il primo modale che appare con i 3 pulsanti
 struct OptionsMenuView: View {
     @Environment(\.dismiss) var dismiss
     @State private var secondaryOption: CreationOption? = nil
@@ -66,9 +66,8 @@ struct OptionButton: View {
     }
 }
 
-// 2. NewListView (Crea Nuova Lista)
+// Crea Nuova Lista
 struct NewListView: View {
-    // 👈 1. MODIFICA: Usa @EnvironmentObject
     @EnvironmentObject var data: AppData
     
     let dismissParent: DismissAction
@@ -112,9 +111,8 @@ struct NewListView: View {
     }
 }
 
-// 3. NewGroupView (Crea Nuovo Gruppo)
+// Crea Nuovo Gruppo
 struct NewGroupView: View {
-    // 👈 2. MODIFICA: Usa @EnvironmentObject
     @EnvironmentObject var data: AppData
     
     let dismissParent: DismissAction
@@ -155,9 +153,9 @@ struct NewGroupView: View {
     }
 }
 
-// 4. ItemsView (Aggiungi Elementi)
+// Aggiungi items
 struct ItemsView: View {
-    // 1. Riceve i dati centralizzati
+    // Riceve i dati centralizzati
     @EnvironmentObject var data: AppData
     
     // Azione per chiudere l'intero flusso modale (pulsante "Cancel")
@@ -166,12 +164,11 @@ struct ItemsView: View {
     var body: some View {
         NavigationStack {
             List {
-                // 2. Itera sulle TUE liste
                 // Usiamo gli indici per ottenere il binding ($)
                 ForEach(data.lists.indices, id: \.self) { index in
                     
-                    // 3. NavigationLink passa il binding ($data.lists[index])
-                    //    alla nuova AddItemView
+                    // NavigationLink passa il binding ($data.lists[index])
+                    // alla nuova AddItemView
                     NavigationLink(destination: AddItemView(list: $data.lists[index])) {
                         // Mostra l'icona e il nome della lista
                         HStack(spacing: 12) {
@@ -210,7 +207,7 @@ struct AddItemView: View {
         // Usiamo un Form per l'input
         Form {
             Section(header: Text("New Item Name")) {
-                TextField("Es. 'Nuova App Fantastica'", text: $newItemName)
+                TextField("Es. 'New Fantastic Item'", text: $newItemName)
                     .autocorrectionDisabled(true)
             }
         }
@@ -247,7 +244,6 @@ struct OptionsMenu_Preview: View {
             OptionsMenuView(selectedOption: .items)
                 .presentationDetents([.fraction(0.30)])
         }
-        // 👈 3. MODIFICA: Usa .environmentObject (risolve l'errore della riga 232)
         .environmentObject(AppData())
     }
 }

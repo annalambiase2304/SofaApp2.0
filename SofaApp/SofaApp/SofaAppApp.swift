@@ -8,10 +8,10 @@
 import SwiftUI
 
 @main
-struct SofaAppApp: App { // Il nome SofaAppApp sarà il nome del tuo progetto + App
+struct SofaAppApp: App { 
     var body: some Scene {
         WindowGroup {
-            ContainerView() // Chiama la tua ContentView
+            ContainerView()
         }
     }
 }

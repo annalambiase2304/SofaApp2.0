@@ -28,7 +28,7 @@ enum CreationOption: String, Identifiable {
     }
 }
 
-// 3. Struttura per un Gruppo
+// Struttura per un Gruppo
 struct ListGroup: Identifiable, Hashable {
     let id = UUID()
     var name: String
@@ -41,7 +41,7 @@ let mockGroups: [ListGroup] = [
     ListGroup(name: "Personal")
 ]
 
-// 4. Struttura per un SINGOLO ELEMENTO (Es. "1984")
+// Struttura per un SINGOLO ELEMENTO (Es. "1984")
 // 👈 QUESTO È IL NUOVO ELEMENTO FONDAMENTALE
 struct ListItem: Identifiable, Hashable {
     let id = UUID()
@@ -49,7 +49,7 @@ struct ListItem: Identifiable, Hashable {
     var isChecked: Bool = false // Per la checklist
 }
 
-// 5. Struttura per una Lista (Ora contiene un array di ListItem)
+// Struttura per una Lista (Ora contiene un array di ListItem)
 struct AppList: Identifiable, Hashable {
     let id = UUID()
     var name: String
@@ -59,7 +59,7 @@ struct AppList: Identifiable, Hashable {
     var items: [ListItem] = [] // 👈 MODIFICA: La lista ora ha elementi
 }
 
-// 6. Classe Dati Osservabile
+// Classe Dati Osservabile
 
 class AppData: ObservableObject {
     @Published var lists:[ AppList] = [
